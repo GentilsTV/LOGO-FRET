@@ -23,45 +23,22 @@
         h2 { color: #1e3a8a; font-size: 24px; margin-bottom: 5px; text-align: center; }
         .subtitle { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 20px; }
         
-        .auth-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .auth-btn {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #2563eb;
-            background: white;
-            color: #2563eb;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-        }
-        .auth-btn.active {
-            background: #2563eb;
-            color: white;
-        }
+        .auth-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        .auth-btn { flex: 1; padding: 10px; border: 2px solid #2563eb; background: white; color: #2563eb; font-weight: bold; border-radius: 8px; cursor: pointer; text-align: center; }
+        .auth-btn.active { background: #2563eb; color: white; }
         .form-section { display: none; }
         .form-section.active { display: block; }
 
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 13px; color: #1e293b; }
-        input, select, textarea {
-            width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none;
-        }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; }
         input:focus, select:focus, textarea:focus { border-color: #2563eb; }
         textarea { resize: vertical; height: 60px; }
         
-        button.action-btn {
-            width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
-        }
-        .whatsapp-btn {
-            display: block; text-align: center; background-color: #25D366; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px; font-size: 14px;
-        }
+        button.action-btn { width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .whatsapp-btn { display: block; text-align: center; background-color: #25D366; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px; font-size: 14px; }
         .admin-panel { display: none; }
-        #resultat { margin-top: 15px; text-align: center; font-weight: bold; font-size: 14px; }
+        #resultat, #authMsg { margin-top: 15px; text-align: center; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -69,14 +46,14 @@
         <h2>Log Fret</h2>
         <div class="subtitle">Espace Sécurisé Administration & Agents</div>
 
-        <!-- PORTAIL AUTHENTIFICATION (Connexion / Inscription) -->
+        <!-- PORTAIL AUTHENTIFICATION -->
         <div id="authContainer">
             <div class="auth-buttons">
                 <button class="auth-btn active" onclick="switchTab('login')">Connexion</button>
                 <button class="auth-btn" onclick="switchTab('register')">Inscription</button>
             </div>
 
-            <!-- Formulaire de Connexion -->
+            <!-- Connexion -->
             <div id="loginSection" class="form-section active">
                 <form onsubmit="handleLogin(event)">
                     <div class="form-group">
@@ -87,11 +64,11 @@
                         <label>Mot de passe</label>
                         <input type="password" id="loginPassword" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="action-btn">Se connecter</button>
+                    <button type="submit" class="action-btn" id="btnLogin">Se connecter</button>
                 </form>
             </div>
 
-            <!-- Formulaire d'Inscription -->
+            <!-- Inscription -->
             <div id="registerSection" class="form-section">
                 <form onsubmit="handleRegister(event)">
                     <div class="form-group">
@@ -106,9 +83,10 @@
                         <label>Mot de passe</label>
                         <input type="password" id="regPassword" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="action-btn" style="background: linear-gradient(135deg, #16a34a, #15803d);">Créer mon compte</button>
+                    <button type="submit" class="action-btn" id="btnReg" style="background: linear-gradient(135deg, #16a34a, #15803d);">Créer mon compte</button>
                 </form>
             </div>
+            <div id="authMsg"></div>
         </div>
 
         <!-- TABLEAU DE BORD AGENT -->
@@ -175,11 +153,13 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxUXT3GlQHS9oghyAdkFkrgfZ8UQFJU8vkubapEWEDb3-aoPRXodnObldqW4RwSf4UQZw/exec';
+        // Ton nouveau lien Google Apps Script mis à jour
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzIyvxUaF43_bpHaumsI0oYsttmPO_-r0FvYb5vpFWjTlXiGXbW9DUzJHY-LgNNm7Mqhg/exec';
 
         function switchTab(tab) {
             document.querySelectorAll('.auth-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('authMsg').innerText = "";
             if (tab === 'login') {
                 document.querySelectorAll('.auth-btn')[0].classList.add('active');
                 document.getElementById('loginSection').classList.add('active');
@@ -189,41 +169,89 @@
             }
         }
 
-        function handleRegister(e) {
+        async function handleRegister(e) {
             e.preventDefault();
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            const pass = document.getElementById('regPassword').value;
+            const btn = document.getElementById('btnReg');
+            const msg = document.getElementById('authMsg');
             
-            localStorage.setItem('logfret_agent', name);
-            localStorage.setItem('logfret_email', email);
-            localStorage.setItem('logfret_pass', pass);
-            
-            alert("Compte créé avec succès ! Connectez-vous maintenant.");
-            switchTab('login');
+            const data = {
+                action: "register",
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value
+            };
+
+            btn.disabled = true;
+            msg.style.color = "#2563eb";
+            msg.innerText = "Création du compte en cours...";
+
+            try {
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                const res = await response.json();
+
+                if (res.result === "success") {
+                    msg.style.color = "#16a34a";
+                    msg.innerText = "Compte créé avec succès ! Connectez-vous.";
+                    setTimeout(() => switchTab('login'), 1500);
+                } else {
+                    msg.style.color = "#dc2626";
+                    msg.innerText = res.message || "Erreur lors de l'inscription.";
+                }
+            } catch (err) {
+                msg.style.color = "#dc2626";
+                msg.innerText = "Erreur de connexion au serveur.";
+            } finally {
+                btn.disabled = false;
+            }
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPassword').value;
-            
-            const savedEmail = localStorage.getItem('logfret_email');
-            const savedPass = localStorage.getItem('logfret_pass');
-            const savedName = localStorage.getItem('logfret_agent') || "Agent Log Fret";
+            const btn = document.getElementById('btnLogin');
+            const msg = document.getElementById('authMsg');
 
-            if ((savedEmail && email === savedEmail && pass === savedPass) || (!savedEmail && email === "admin@logfret.com" && pass === "admin")) {
-                document.getElementById('authContainer').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('agentConnected').innerText = `👤 Connecté : ${savedName}`;
-            } else {
-                alert("Email ou mot de passe incorrect.");
+            const data = {
+                action: "login",
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            btn.disabled = true;
+            msg.style.color = "#2563eb";
+            msg.innerText = "Connexion en cours...";
+
+            try {
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                const res = await response.json();
+
+                if (res.result === "success") {
+                    localStorage.setItem('logfret_agent', res.name);
+                    document.getElementById('authContainer').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('agentConnected').innerText = `👤 Connecté : ${res.name}`;
+                } else {
+                    msg.style.color = "#dc2626";
+                    msg.innerText = res.message || "Identifiants incorrects.";
+                }
+            } catch (err) {
+                msg.style.color = "#dc2626";
+                msg.innerText = "Erreur de connexion au serveur.";
+            } finally {
+                btn.disabled = false;
             }
         }
 
         function logout() {
+            localStorage.removeItem('logfret_agent');
             document.getElementById('authContainer').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('authMsg').innerText = "";
         }
 
         document.getElementById('colisForm').addEventListener('submit', async function(e) {
@@ -251,7 +279,7 @@
             btn.disabled = true;
             btn.innerText = "Enregistrement en cours...";
             resDiv.style.color = "#2563eb";
-            resDiv.innerText = "Envoi vers la base de données...";
+            resDiv.innerText = "Envoi vers Google Sheets...";
 
             try {
                 await fetch(scriptURL, {
@@ -273,4 +301,4 @@
         });
     </script>
 </body>
-                        </html>
+    </html>
