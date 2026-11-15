@@ -212,8 +212,7 @@
     </div>
 
     <script>
-        // Ton nouveau lien Google Apps Script
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyucirQVDTnR-jJ6qq5rMbl1gm80zmQcinYcPViJ8NBf8FtsNCBI6H-6Rs85rYgUS6JjQ/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzituw87f5u-0_YUoweWNmxlVWLTC54KDtT9kHPX1333oatF4fBT1nUym78kP66v2mH/exec';
         let currentTrackingFound = "";
 
         function switchAuthTab(tab) {
@@ -272,7 +271,19 @@
             e.preventDefault();
             const btn = document.getElementById('btnLogin');
             const msg = document.getElementById('authMsg');
-            const data = { action: "login", email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value };
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            // SÉCURITÉ DE SECOURS : Connexion directe administrateur garantie
+            if (email === "gentilesservices@gmail.com" && password === "9198") {
+                localStorage.setItem('logfret_agent', 'Nacky (Admin)');
+                document.getElementById('authContainer').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('agentConnected').innerText = `👤 Connecté : Nacky (Admin)`;
+                return;
+            }
+
+            const data = { action: "login", email: email, password: password };
 
             btn.disabled = true;
             msg.style.color = "#2563eb";
@@ -424,4 +435,4 @@
         }
     </script>
 </body>
-                        </html>
+</html>
