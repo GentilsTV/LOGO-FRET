@@ -19,15 +19,28 @@
             padding: 25px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
         }
-        h2 { color: #1e3a8a; font-size: 24px; margin-bottom: 5px; text-align: center; }
-        .subtitle { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 20px; }
+        .logo-container {
+            margin-bottom: 15px;
+        }
+        .logo-container img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #2563eb;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 { color: #1e3a8a; font-size: 24px; margin-bottom: 5px; }
+        .subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; }
         
-        .auth-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
-        .auth-btn { flex: 1; padding: 10px; border: 2px solid #2563eb; background: white; color: #2563eb; font-weight: bold; border-radius: 8px; cursor: pointer; text-align: center; }
-        .auth-btn.active { background: #2563eb; color: white; }
-        .form-section { display: none; }
-        .form-section.active { display: block; }
+        .auth-buttons, .menu-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        .auth-btn, .menu-btn { flex: 1; padding: 10px; border: 2px solid #2563eb; background: white; color: #2563eb; font-weight: bold; border-radius: 8px; cursor: pointer; text-align: center; font-size: 13px; }
+        .auth-btn.active, .menu-btn.active { background: #2563eb; color: white; }
+        
+        .form-section, .admin-sub-section { display: none; text-align: left; }
+        .form-section.active, .admin-sub-section.active { display: block; }
 
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 13px; color: #1e293b; }
@@ -36,21 +49,27 @@
         textarea { resize: vertical; height: 60px; }
         
         button.action-btn { width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button.success-btn { background: linear-gradient(135deg, #16a34a, #15803d); }
         .whatsapp-btn { display: block; text-align: center; background-color: #25D366; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 15px; font-size: 14px; }
         .admin-panel { display: none; }
-        #resultat, #authMsg { margin-top: 15px; text-align: center; font-weight: bold; font-size: 14px; }
+        #resultat, #authMsg, #receptionMsg { margin-top: 15px; text-align: center; font-weight: bold; font-size: 14px; }
+        .card-details { background: #f8fafc; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #2563eb; font-size: 13px; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Logo de l'entreprise -->
+        <div class="logo-container">
+            <img src="https://lh3.googleusercontent.com/d/1DMZZIHvYoBbfbUMW7LQ1RxgLG2qmhvqG=s512" alt="Logo Log Fret">
+        </div>
         <h2>Log Fret</h2>
         <div class="subtitle">Espace Sécurisé Administration & Agents</div>
 
         <!-- PORTAIL AUTHENTIFICATION -->
         <div id="authContainer">
             <div class="auth-buttons">
-                <button class="auth-btn active" onclick="switchTab('login')">Connexion</button>
-                <button class="auth-btn" onclick="switchTab('register')">Inscription</button>
+                <button class="auth-btn active" onclick="switchAuthTab('login')">Connexion</button>
+                <button class="auth-btn" onclick="switchAuthTab('register')">Inscription</button>
             </div>
 
             <!-- Connexion -->
@@ -83,7 +102,7 @@
                         <label>Mot de passe</label>
                         <input type="password" id="regPassword" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="action-btn" id="btnReg" style="background: linear-gradient(135deg, #16a34a, #15803d);">Créer mon compte</button>
+                    <button type="submit" class="action-btn success-btn" id="btnReg">Créer mon compte</button>
                 </form>
             </div>
             <div id="authMsg"></div>
@@ -96,67 +115,107 @@
                 <button onclick="logout()" style="background: #dc2626; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;">Déconnexion</button>
             </div>
 
-            <h3 style="font-size: 16px; color: #1e3a8a; margin-top:0;">Enregistrer un Nouveau Colis</h3>
-            
-            <form id="colisForm">
-                <div class="form-group">
-                    <label>Nom du Client (Expéditeur)</label>
-                    <input type="text" id="client" placeholder="Ex: Kouadio Jean" required>
-                </div>
-                <div class="form-group">
-                    <label>Téléphone de l'Expéditeur</label>
-                    <input type="tel" id="telExp" placeholder="Ex: +22507000000" required>
-                </div>
-                <div class="form-group">
-                    <label>Téléphone du Destinataire</label>
-                    <input type="tel" id="telDest" placeholder="Ex: +33600000000" required>
-                </div>
-                <div class="form-group">
-                    <label>Destination</label>
-                    <select id="destination">
-                        <option value="Abidjan - Paris">Abidjan ➔ Paris</option>
-                        <option value="Abidjan - Italie">Abidjan ➔ Italie</option>
-                        <option value="Abidjan - Sous-région">Abidjan ➔ Sous-région</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Description du Colis</label>
-                    <textarea id="description" placeholder="Ex: 3 Cartons de vêtements..." required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Poids (Kg)</label>
-                    <input type="number" step="0.1" id="poids" placeholder="Ex: 12.5" required>
-                </div>
-                <div class="form-group">
-                    <label>Prix de l'expédition (FCFA)</label>
-                    <input type="number" id="prix" placeholder="Ex: 75000" required>
-                </div>
-                <div class="form-group">
-                    <label>Date & Heure d'Expédition</label>
-                    <input type="datetime-local" id="dateExp" required>
-                </div>
-                <div class="form-group">
-                    <label>Date & Heure d'Arrivée (Estimée)</label>
-                    <input type="datetime-local" id="dateArrivee" required>
-                </div>
-                <div class="form-group">
-                    <label>Lien de Suivi GPS / Satellite (Optionnel)</label>
-                    <input type="url" id="gps" placeholder="Ex: https://maps.google.com/...">
-                </div>
+            <!-- DEUX BOUTONS PRINCIPAUX ADMIN -->
+            <div class="menu-buttons">
+                <button class="menu-btn active" onclick="switchAdminTab('record')">📦 Enregistrer</button>
+                <button class="menu-btn" onclick="switchAdminTab('reception')">🏢 Réception</button>
+            </div>
 
-                <button type="submit" id="btnSubmit" class="action-btn">Enregistrer le Colis</button>
-            </form>
-            <div id="resultat"></div>
+            <!-- SECTION 1 : ENREGISTRER UN COLIS -->
+            <div id="recordSection" class="admin-sub-section active">
+                <form id="colisForm">
+                    <div class="form-group">
+                        <label>Nom du Client (Expéditeur)</label>
+                        <input type="text" id="client" placeholder="Ex: Kouadio Jean" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone de l'Expéditeur</label>
+                        <input type="tel" id="telExp" placeholder="Ex: +22507000000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Téléphone du Destinataire</label>
+                        <input type="tel" id="telDest" placeholder="Ex: +33600000000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Destination</label>
+                        <select id="destination">
+                            <option value="Abidjan - Paris">Abidjan ➔ Paris</option>
+                            <option value="Abidjan - Italie">Abidjan ➔ Italie</option>
+                            <option value="Abidjan - Sous-région">Abidjan ➔ Sous-région</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description du Colis</label>
+                        <textarea id="description" placeholder="Ex: 3 Cartons de vêtements..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Poids (Kg)</label>
+                        <input type="number" step="0.1" id="poids" placeholder="Ex: 12.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Prix de l'expédition (FCFA)</label>
+                        <input type="number" id="prix" placeholder="Ex: 75000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date & Heure d'Expédition</label>
+                        <input type="datetime-local" id="dateExp" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date & Heure d'Arrivée (Estimée)</label>
+                        <input type="datetime-local" id="dateArrivee" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Lien de Suivi GPS / Satellite (Optionnel)</label>
+                        <input type="url" id="gps" placeholder="Ex: https://maps.google.com/...">
+                    </div>
+
+                    <button type="submit" id="btnSubmit" class="action-btn">Enregistrer le Colis</button>
+                </form>
+                <div id="resultat"></div>
+            </div>
+
+            <!-- SECTION 2 : RÉCEPTION & LIVRAISON DU COLIS -->
+            <div id="receptionSection" class="admin-sub-section">
+                <div class="form-group">
+                    <label>Entrer ou Scanner le Numéro de Suivi</label>
+                    <input type="text" id="searchTracking" placeholder="Ex: LF-981006">
+                </div>
+                <button type="button" class="action-btn" onclick="chercherColisAdmin()">Rechercher le Colis</button>
+
+                <div id="colisDetailsCard" class="card-details">
+                    <div style="margin-bottom: 6px;"><b>Client :</b> <span id="detClient"></span></div>
+                    <div style="margin-bottom: 6px;"><b>Destination :</b> <span id="detDest"></span></div>
+                    <div style="margin-bottom: 10px;"><b>Statut Actuel :</b> <span id="detStatut" style="color: #16a34a; font-weight: bold;"></span></div>
+
+                    <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 10px 0;">
+
+                    <!-- Bouton 1 : Marquer Arrivé en Agence -->
+                    <button type="button" class="action-btn" style="background: #2563eb; margin-bottom: 10px; font-size: 14px;" onclick="marquerArriveAgence()">📍 Marquer : Arrivé et Réceptionné par l'Agence</button>
+
+                    <!-- Formulaire Bouton 2 : Marquer Livré au Destinataire -->
+                    <div style="background: #f1f5f9; padding: 10px; border-radius: 6px;">
+                        <label style="font-size: 12px; font-weight: bold; color: #1e3a8a; margin-bottom: 6px;">Enregistrer la Décharge & Remise au Destinataire</label>
+                        <div class="form-group" style="margin-bottom: 8px;">
+                            <input type="text" id="nomRecap" placeholder="Nom complet du destinataire" style="padding: 8px; font-size: 13px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 8px;">
+                            <input type="tel" id="telRecap" placeholder="Numéro de téléphone" style="padding: 8px; font-size: 13px;">
+                        </div>
+                        <button type="button" class="action-btn success-btn" style="font-size: 14px; padding: 10px;" onclick="marquerDelivered()">✅ Valider la Remise (Colis Réceptionné)</button>
+                    </div>
+                </div>
+                <div id="receptionMsg"></div>
+            </div>
         </div>
 
         <a href="https://wa.me/2250170979736" target="_blank" class="whatsapp-btn">💬 Contact WhatsApp Log Fret</a>
     </div>
 
     <script>
-        // Ton nouveau lien Google Apps Script mis à jour
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzIyvxUaF43_bpHaumsI0oYsttmPO_-r0FvYb5vpFWjTlXiGXbW9DUzJHY-LgNNm7Mqhg/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyucirQVDTnR-jJ6qq5rMbl1gm80zmQcinYcPViJ8NBf8FtsNCBI6H-6Rs85rYgUS6JjQ/exec';
+        let currentTrackingFound = "";
 
-        function switchTab(tab) {
+        function switchAuthTab(tab) {
             document.querySelectorAll('.auth-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
             document.getElementById('authMsg').innerText = "";
@@ -169,67 +228,58 @@
             }
         }
 
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.admin-sub-section').forEach(s => s.classList.remove('active'));
+            if (tab === 'record') {
+                document.querySelectorAll('.menu-btn')[0].classList.add('active');
+                document.getElementById('recordSection').classList.add('active');
+            } else {
+                document.querySelectorAll('.menu-btn')[1].classList.add('active');
+                document.getElementById('receptionSection').classList.add('active');
+            }
+        }
+
         async function handleRegister(e) {
             e.preventDefault();
             const btn = document.getElementById('btnReg');
             const msg = document.getElementById('authMsg');
-            
-            const data = {
-                action: "register",
-                name: document.getElementById('regName').value,
-                email: document.getElementById('regEmail').value,
-                password: document.getElementById('regPassword').value
-            };
+            const data = { action: "register", name: document.getElementById('regName').value, email: document.getElementById('regEmail').value, password: document.getElementById('regPassword').value };
 
             btn.disabled = true;
             msg.style.color = "#2563eb";
-            msg.innerText = "Création du compte en cours...";
+            msg.innerText = "Création du compte...";
 
             try {
-                const response = await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
+                const response = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) });
                 const res = await response.json();
-
                 if (res.result === "success") {
                     msg.style.color = "#16a34a";
                     msg.innerText = "Compte créé avec succès ! Connectez-vous.";
-                    setTimeout(() => switchTab('login'), 1500);
+                    setTimeout(() => switchAuthTab('login'), 1500);
                 } else {
                     msg.style.color = "#dc2626";
-                    msg.innerText = res.message || "Erreur lors de l'inscription.";
+                    msg.innerText = res.message || "Erreur.";
                 }
             } catch (err) {
                 msg.style.color = "#dc2626";
-                msg.innerText = "Erreur de connexion au serveur.";
-            } finally {
-                btn.disabled = false;
-            }
+                msg.innerText = "Erreur réseau.";
+            } finally { btn.disabled = false; }
         }
 
         async function handleLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('btnLogin');
             const msg = document.getElementById('authMsg');
-
-            const data = {
-                action: "login",
-                email: document.getElementById('loginEmail').value,
-                password: document.getElementById('loginPassword').value
-            };
+            const data = { action: "login", email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value };
 
             btn.disabled = true;
             msg.style.color = "#2563eb";
-            msg.innerText = "Connexion en cours...";
+            msg.innerText = "Connexion...";
 
             try {
-                const response = await fetch(scriptURL, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
+                const response = await fetch(scriptURL, { method: 'POST', body: JSON.stringify(data) });
                 const res = await response.json();
-
                 if (res.result === "success") {
                     localStorage.setItem('logfret_agent', res.name);
                     document.getElementById('authContainer').style.display = 'none';
@@ -241,17 +291,14 @@
                 }
             } catch (err) {
                 msg.style.color = "#dc2626";
-                msg.innerText = "Erreur de connexion au serveur.";
-            } finally {
-                btn.disabled = false;
-            }
+                msg.innerText = "Erreur réseau.";
+            } finally { btn.disabled = false; }
         }
 
         function logout() {
             localStorage.removeItem('logfret_agent');
             document.getElementById('authContainer').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('authMsg').innerText = "";
         }
 
         document.getElementById('colisForm').addEventListener('submit', async function(e) {
@@ -259,8 +306,8 @@
             const btn = document.getElementById('btnSubmit');
             const resDiv = document.getElementById('resultat');
             const agentName = localStorage.getItem('logfret_agent') || "Agent Principal";
-            
             const trackingID = 'LF-' + Math.floor(100000 + Math.random() * 900000);
+            
             const data = {
                 client: document.getElementById('client').value,
                 telExp: document.getElementById('telExp').value,
@@ -277,28 +324,103 @@
             };
 
             btn.disabled = true;
-            btn.innerText = "Enregistrement en cours...";
             resDiv.style.color = "#2563eb";
-            resDiv.innerText = "Envoi vers Google Sheets...";
+            resDiv.innerText = "Enregistrement en cours...";
 
             try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(data)
-                });
-                
+                await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
                 resDiv.style.color = "#16a34a";
-                resDiv.innerHTML = `Colis enregistré avec succès !<br><b>Numéro de Suivi : ${trackingID}</b>`;
+                resDiv.innerHTML = `Colis enregistré !<br><b>Numéro de Suivi : ${trackingID}</b>`;
                 document.getElementById('colisForm').reset();
             } catch (error) {
                 resDiv.style.color = "#dc2626";
                 resDiv.innerText = "Erreur lors de l'enregistrement.";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Enregistrer le Colis";
-            }
+            } finally { btn.disabled = false; }
         });
+
+        async function chercherColisAdmin() {
+            const tracking = document.getElementById('searchTracking').value.trim();
+            const msg = document.getElementById('receptionMsg');
+            const card = document.getElementById('colisDetailsCard');
+
+            if (!tracking) { alert("Entrez un numéro de suivi."); return; }
+
+            msg.style.color = "#2563eb";
+            msg.innerText = "Recherche...";
+            card.style.display = "none";
+
+            try {
+                const response = await fetch(`${scriptURL}?tracking=${tracking}`);
+                const data = await response.json();
+
+                if (data.result === "found") {
+                    currentTrackingFound = data.tracking;
+                    document.getElementById('detClient').innerText = data.client;
+                    document.getElementById('detDest').innerText = data.destination;
+                    document.getElementById('detStatut').innerText = data.statut;
+                    card.style.display = "block";
+                    msg.innerText = "";
+                } else {
+                    msg.style.color = "#dc2626";
+                    msg.innerText = "Aucun colis trouvé avec ce numéro.";
+                }
+            } catch (error) {
+                msg.style.color = "#dc2626";
+                msg.innerText = "Erreur de connexion.";
+            }
+        }
+
+        async function marquerArriveAgence() {
+            const agentName = localStorage.getItem('logfret_agent') || "Agent Agence";
+            const msg = document.getElementById('receptionMsg');
+
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "update_arrival", tracking: currentTrackingFound, agent: agentName })
+                });
+                msg.style.color = "#16a34a";
+                msg.innerText = "Statut mis à jour : Colis arrivé en agence !";
+                document.getElementById('detStatut').innerText = "Colis arrivé et réceptionné par l'agence de destination";
+            } catch (err) {
+                msg.style.color = "#dc2626";
+                msg.innerText = "Erreur lors de la mise à jour.";
+            }
+        }
+
+        async function marquerDelivered() {
+            const nomDest = document.getElementById('nomRecap').value.trim();
+            const telDest = document.getElementById('telRecap').value.trim();
+            const agentName = localStorage.getItem('logfret_agent') || "Agent Livreur";
+            const msg = document.getElementById('receptionMsg');
+
+            if (!nomDest || !telDest) { alert("Veuillez remplir le nom et le téléphone du destinataire."); return; }
+
+            const now = new Date().toLocaleString('fr-FR');
+            const data = {
+                action: "update_delivered",
+                tracking: currentTrackingFound,
+                nomDest: nomDest,
+                telDest: telDest,
+                dateRetrait: now,
+                agent: agentName
+            };
+
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                msg.style.color = "#16a34a";
+                msg.innerText = "Colis marqué comme livré avec succès !";
+                document.getElementById('detStatut').innerText = `Colis réceptionné par : ${nomDest} (Tél: ${telDest}) le ${now}`;
+                document.getElementById('nomRecap').value = "";
+                document.getElementById('telRecap').value = "";
+            } catch (err) {
+                msg.style.color = "#dc2626";
+                msg.innerText = "Erreur lors de la validation.";
+            }
+        }
     </script>
 </body>
     </html>
